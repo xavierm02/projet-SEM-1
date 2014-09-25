@@ -24,6 +24,10 @@ let lift_binop op v w =
   match v, w with
   | Int(n), Int(m) -> Int(op n m)
 
+let lift_binop_bool op v w =
+  match v, w with
+  | Int(n), Int(m) -> Int(if op n m then 1 else 0)
+
 (** {2 Fonctions d'entrée/sortie fichiers} *)
 
 (**/**)

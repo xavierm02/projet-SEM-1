@@ -1,17 +1,22 @@
 (** Définition de l'interpréteur TOY *)
 open ToyTypes
+open ToyEnv
+open Utils
 
 (** [eval_expr e s] évalue l'expression [e] dans l'environnement [s] *)
 let rec eval_expr expr (sigma: ToyEnv.env) : value =
   match expr with
-    | Expr_Num(n) -> Utils.int_to_value n (*
-    | Expr_Var of var
-    | Expr_Plus of (expr * expr)
-    | Expr_Mult of (expr * expr)
-    | Expr_Equal of (expr * expr)
-    | Expr_Less of (expr * expr)
-    | Expr_Unsupported*)
-    | _ -> raise Unsupported_Expression
+    | Expr_Num(n) -> Utils.int_to_value n
+    | Expr_Var v -> begin
+	    match eval_env v sigma with
+	      | Some x -> x
+	      | None -> raise (Uninitialized_Variable v)
+	end
+    | Expr_Plus (x, y) -> lift_binop (+) (eval_expr x sigma) (eval_expr y sigma)
+    | Expr_Mult (x, y) -> lift_binop ( * ) (eval_expr x sigma) (eval_expr y sigma)
+    | Expr_Equal (x, y) -> lift_binop_bool (=) (eval_expr x sigma) (eval_expr y sigma)
+    | Expr_Less (x, y) -> lift_binop_bool (<) (eval_expr x sigma) (eval_expr y sigma)
+    | Expr_Unsupported -> raise Unsupported_Expression
 
 (** Type des configurations d'exécution *)
 type outcome =
