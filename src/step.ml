@@ -6,7 +6,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value =
   match expr with
     | Expr_Num(n) -> Utils.int_to_value n
     | _ ->
-        prerr_endline "TODO eval_expr";
+        prerr_endline "TODO eval_expr";(* ICI *)
         Utils.value0
 
 (** Type des configurations d'exécution *)
