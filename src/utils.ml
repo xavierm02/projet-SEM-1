@@ -62,3 +62,7 @@ let parse source =
     ToyParser.make_prog ToyLexer.make_token (Lexing.from_channel ch)
   )
 
+
+
+let (|>) x f = f x
+

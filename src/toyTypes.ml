@@ -37,3 +37,4 @@ type value = Int of int
 
 exception Unsupported_Expression
 exception Uninitialized_Variable of var
+exception Unsupported_Command
