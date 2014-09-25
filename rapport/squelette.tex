@@ -1,0 +1,65 @@
+\documentclass[11pt]{scrartcl}
+
+%% Corrige quelques erreurs de LaTeX2ε
+\usepackage{fixltx2e}
+\usepackage{xspace}
+\usepackage{microtype}
+
+%% Pour ne pas commettre les erreurs fréquentes décrites dans l2tabu
+\usepackage[l2tabu,abort]{nag}
+
+%% Saisie en UTF-8
+\usepackage[utf8]{inputenc}
+%% Fonte : cf. http://www.tug.dk/FontCatalogue/
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+%% Pour écrire du français
+\usepackage[frenchb]{babel}
+
+%% Pour composer des mathématiques
+\usepackage{mathtools}
+
+%% Quelques paquets qui peuvent se révéler utiles pour parler
+%%  des langages de programmation et de leurs sémantiques.
+%% Consultez-en la documentation.
+%\usepackage{listings}
+%\usepackage{semantic}
+
+% pour l’exemple…
+\usepackage{kantlipsum}
+
+\begin{document}
+
+% Pour générer un titre
+\author{Un~\bsc{Élève} \and Son~\bsc{Acolyte}}
+\date{11 octobre 1582}
+\title{De Semantica Rerum}
+\maketitle
+
+\begin{abstract}
+  \kant[1]
+\end{abstract}
+
+\section{Introduction}
+\kant[2-3]
+
+\section{Titre de la section~\ref{sec:labsec1}}
+\label{sec:labsec1}
+\subsection{Une sous-section}
+\kant[4-5]
+\subsection{Une autre sous-section}
+\kant[5-6]
+
+\section{Titre de la section~\ref{sec:labsec2}}
+\label{sec:labsec2}
+\kant[7-8]
+
+\section{Titre de la section~\ref{sec:labsec3}}
+\label{sec:labsec3}
+\kant[9-10]
+
+\section{Conclusion}
+\kant[164]
+
+\end{document}

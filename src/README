@@ -1,0 +1,49 @@
+# Contenu du répertoire 
+
+utils.ml     		diverses définitions auxiliaires
+
+toyTypes.ml   		types des AST et des valeurs pour le langage TOY
+
+toyLexer.mll		analyseur lexical TOY
+toyParser.mly		analyseur syntaxique TOY
+toyPrinter.{ml,mli}	pretty printer pour le langage TOY
+
+toyEnv.{ml,mli}		environnements d'évaluation des programmes TOY
+step.ml			définition de l'interpréteur TOY
+toy.ml			fonction principale appelant l'interpréteur TOY
+
+exemples/*.toy		programmes exemples
+
+
+# Suggestions de compilation
+
+Pour compiler le programme `toy.ml` et toutes ses dépendances:
+
+    ocamlbuild toy.native
+
+Lancer l'exécutable ainsi produit
+
+    ./toy.native
+
+Nettoyer les fichiers de build
+
+    ocamlbuild -clean
+
+Pour compiler les modules du projet (listés dans `itoy.mltop`) et un
+interpréteur OCaml lié à ces modules:
+
+    ocamlbuild itoy.top
+
+On l’utilise en exécutant par exemple:
+
+    ./itoy.top -I _build
+
+(Les outils comme `rlwrap` ou `ledit` améliorent grandement l’ergonomie
+de l'interpréteur OCaml ainsi constuit).
+
+Pour générer la documentation des modules indiqués dans le fichier toy.odocl :
+
+    ocamlbuild -docflags -charset,utf-8 toy.docdir/index.html
+
+Tout savoir sur `ocamlbuild`:
+<http://caml.inria.fr/pub/docs/manual-ocaml/ocamlbuild.html>

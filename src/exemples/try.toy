@@ -1,0 +1,19 @@
+
+try
+  try 
+    print 1;
+    try
+      print 2;
+      raise aaa;
+      print 3;
+      raise bbb
+    with 
+      aaa -> print 4; raise bbb; print 5
+    end;
+    print 6
+  with
+    aaa -> print 7
+  end
+with 
+  bbb -> print 8
+end
