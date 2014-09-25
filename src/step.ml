@@ -4,10 +4,14 @@ open ToyTypes
 (** [eval_expr e s] évalue l'expression [e] dans l'environnement [s] *)
 let rec eval_expr expr (sigma: ToyEnv.env) : value =
   match expr with
-    | Expr_Num(n) -> Utils.int_to_value n
-    | _ ->
-        prerr_endline "TODO eval_expr";(* ICI *) (* OK *)
-        Utils.value0
+    | Expr_Num(n) -> Utils.int_to_value n (*
+    | Expr_Var of var
+    | Expr_Plus of (expr * expr)
+    | Expr_Mult of (expr * expr)
+    | Expr_Equal of (expr * expr)
+    | Expr_Less of (expr * expr)
+    | Expr_Unsupported*)
+    | _ -> raise Unsupported_Expression
 
 (** Type des configurations d'exécution *)
 type outcome =

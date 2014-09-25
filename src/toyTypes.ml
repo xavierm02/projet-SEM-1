@@ -35,4 +35,4 @@ type prog =
 (** Type des valeurs TOY *)
 type value = Int of int 
 
-
+exception Unsupported_Expression
