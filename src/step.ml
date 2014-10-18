@@ -4,20 +4,66 @@ open ToyEnv
 open Utils
 
 (** [eval_expr e s] évalue l'expression [e] dans l'environnement [s] *)
-let rec eval_expr expr (sigma: ToyEnv.env) : value =
+let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
   match expr with
-    | Expr_Num(n) -> Utils.int_to_value n
+    | Expr_Num (n) -> (Utils.int_to_value n, sigma)
     | Expr_Var v -> begin
 	  match eval_env v sigma with
-	    | Some x -> x
-	    | None -> raise (Uninitialized_Variable v)
-	end
-    | Expr_Plus (x, y) -> lift_binop (+) (eval_expr x sigma) (eval_expr y sigma)
-    | Expr_Mult (x, y) -> lift_binop ( * ) (eval_expr x sigma) (eval_expr y sigma)
-    | Expr_Equal (x, y) -> lift_binop_bool (=) (eval_expr x sigma) (eval_expr y sigma)
-    | Expr_Less (x, y) -> lift_binop_bool (<) (eval_expr x sigma) (eval_expr y sigma)
-    | Expr_Unsupported -> raise Unsupported_Expression
-
+	    | Some x -> (x, sigma)
+	    | None -> failwith "Uninitialized_Variable v0"
+	 end
+    | Expr_Plus (e1, e2) -> let (v1, sigma') = (eval_expr e1 sigma) in
+                          let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop (+) v1 v2,  sigma'')
+    | Expr_Minus (e1, e2) -> let (v1, sigma') = (eval_expr e1 sigma) in
+                          let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop (-) v1 v2,  sigma'')                     
+    | Expr_Mult (e1, e2) -> let (v1, sigma')=(eval_expr e1 sigma) in
+                          let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop ( * ) v1 v2, sigma'')
+    | Expr_Div (e1, e2) -> let (v1, sigma')=(eval_expr e1 sigma) in
+                          let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop ( / ) v1 v2, sigma'')
+    | Expr_Equal (e1, e2) -> let (v1, sigma')=(eval_expr e1 sigma) in
+                           let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop_bool_int (=) v1 v2, sigma'')
+    | Expr_And (e1, e2) -> let (v1, sigma')=(eval_expr e1 sigma) in
+                           let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop_bool_bool (&&) v1 v2, sigma'')
+    | Expr_Less (e1, e2) -> let (v1, sigma')=(eval_expr e1 sigma) in
+                          let (v2, sigma'')=(eval_expr e2 sigma') in
+                          (lift_binop_bool_int (<) v1 v2, sigma'')
+    | Expr_PostPlus (v) -> begin
+          match eval_env v sigma with
+                | Some x ->  let x1 = int_to_value ((value_to_int x) + 1) in
+                             (x, (update_env v x1 sigma))
+                | None -> failwith "Uninitialized_Variable v1"
+          end
+    | Expr_PostMinus (v) -> begin
+          match eval_env v sigma with
+                | Some x ->  let x1 = int_to_value ((value_to_int x) - 1) in
+                              (x, (update_env v x1 sigma))
+                | None -> failwith "Uninitialized_Variable v2"
+          end
+    | Expr_PrePlus (v) -> begin
+          match eval_env v sigma with
+                | Some x ->  let x1 = int_to_value (( value_to_int x) + 1) in
+                              (x1, (update_env v x1 sigma))
+                | None -> failwith "Uninitialized_Variable v3"
+          end   
+    | Expr_PreMinus (v) -> begin
+          match eval_env v sigma with
+                | Some x ->  let x1 = int_to_value (( value_to_int x) - 1) in
+                              (x1, (update_env v x1 sigma))
+                | None -> failwith "Uninitialized_Variable v4"
+          end
+    | Expr_Eassign (v,e) -> let (v1, sigma') = eval_expr e sigma in
+                            begin match eval_env v sigma with
+                                  | Some x ->  (x, (update_env v v1 sigma'))
+                                  | None -> failwith "Uninitialized_Variable v5"
+                            end
+    |_ -> raise Unsupported_Expression
+    
 (** Type des configurations d'exécution *)
 type outcome =
   | Continue of prog * ToyEnv.env
@@ -28,26 +74,30 @@ type outcome =
 let rec step (p, (sigma: ToyEnv.env)) : outcome =
   match p with
   | Skip -> Finished sigma
-  | Assign (v, e) -> Finished (update_env v (eval_expr e sigma) sigma)
+  | Assign (v, e) -> let (v1, sigma') = (eval_expr e sigma) in
+                     Finished (update_env v v1 sigma')
   | Seq (p1, p2) -> begin
     match step (p1, sigma) with
       | Continue (p1', sigma') -> Continue (Seq (p1', p2), sigma')
       | Finished sigma' -> Continue (p2, sigma')
   end
-  | If (e, p1, p2) ->
-    if (eval_expr e sigma |> value_to_int) <> 0 then
-      step (p1, sigma)
+  | If (e, p1, p2) -> 
+    let (v1, sigma' ) = (eval_expr e sigma) in
+    if (value_to_bool v1) then
+      Continue (p1, sigma')
     else
-	  step (p2, sigma)
-  | While (e, pb) -> begin
-    if (eval_expr e sigma |> value_to_int) <> 0 then
-      step (Seq (pb, p), sigma)
+	  Continue (p2, sigma')
+  | While (e, p1) -> begin
+    let (v1, sigma' ) = (eval_expr e sigma) in
+    if (value_to_bool v1) then
+      Continue (Seq (p1, p), sigma')
     else
-	  Finished sigma
+	  Finished sigma'
   end
   | Print expr -> begin
     print_string "> ";
-    eval_expr expr sigma |> print_value;
+    let (v1, sigma' ) = (eval_expr expr sigma) in
+    print_value v1;
     print_newline ();
     Finished sigma
   end
