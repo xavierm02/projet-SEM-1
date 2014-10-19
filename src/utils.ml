@@ -32,6 +32,11 @@ let lift_unop op v =
   | Int n -> Int (op n)
   | _ -> failwith "cannot apply operator to boolean"
 
+let lift_unop_bool op v =
+  match v with
+  | Bool n -> Bool (op n)
+  | _ -> failwith "cannot apply operator to int"
+
 (** [lift_binop op v w] relève l'opérateur [op] sur les valeurs TOY *)
 let lift_binop op v w =
   match v, w with

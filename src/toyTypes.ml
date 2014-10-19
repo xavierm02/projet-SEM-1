@@ -16,9 +16,15 @@ type expr =
   | Expr_Minus of (expr * expr)
   | Expr_Mult of (expr * expr)
   | Expr_Div of (expr * expr)
-  | Expr_Equal of (expr * expr)
+  | Expr_Not of expr
   | Expr_And of (expr * expr)
+  | Expr_Or of (expr * expr)
+  | Expr_Equal of (expr * expr)
+  | Expr_NotEqual of (expr * expr)
   | Expr_Less of (expr * expr)
+  | Expr_LessEqual of (expr * expr)
+  | Expr_Greater of (expr * expr)
+  | Expr_GreaterEqual of (expr * expr)
   | Expr_PostPlus of var
   | Expr_PostMinus of var
   | Expr_PrePlus of var

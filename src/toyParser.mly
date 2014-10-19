@@ -85,28 +85,28 @@ prog:
   | Token_Raise Token_Var                {Raise($2)}
 
 expr:
-  | expr Token_And expr              {Expr_And($1, $3)} /* FIXME */
-  | expr Token_Or  expr              {Expr_Unsupported} /* FIXME */
+  | expr Token_And expr              {Expr_And($1, $3)}
+  | expr Token_Or  expr              {Expr_Or($1, $3)}
   | expr Token_Equal expr            {Expr_Equal($1,$3)}
-  | expr Token_NotEqual expr         {Expr_Unsupported} /* FIXME */
+  | expr Token_NotEqual expr         {Expr_NotEqual($1,$3)}
   | expr Token_Less expr             {Expr_Less($1,$3)}
-  | expr Token_LessEqual expr        {Expr_Unsupported} /* FIXME */
-  | expr Token_Greater expr          {Expr_Unsupported} /* FIXME */
-  | expr Token_GreaterEqual expr     {Expr_Unsupported} /* FIXME */
+  | expr Token_LessEqual expr        {Expr_LessEqual($1,$3)}
+  | expr Token_Greater expr          {Expr_Greater($1,$3)}
+  | expr Token_GreaterEqual expr     {Expr_GreaterEqual($1,$3)}
   | expr Token_Plus expr             {Expr_Plus($1,$3)}
   | expr Token_Minus expr            {Expr_Plus($1,$3)} 
   | expr Token_Mult expr             {Expr_Mult($1,$3)}
   | expr Token_Div expr              {Expr_Div($1,$3)}
-  | Token_Not expr                   {Expr_Unsupported} /* FIXME */
+  | Token_Not expr                   {Expr_Not($2)}
   | Token_Plus  expr %prec UnarySign {$2}
-  | Token_Minus expr %prec UnarySign {$2} /* FIXME */
+  | Token_Minus expr %prec UnarySign {$2}
   | Token_Num                        {Expr_Num($1)}
   | Token_Var                        {Expr_Var(Var $1)}
   | Token_Var Token_Incr             {Expr_PostPlus(Var $1)} 
   | Token_Var Token_Decr             {Expr_PostMinus(Var $1)} 
   | Token_Incr Token_Var             {Expr_PrePlus(Var $2)} 
   | Token_Decr Token_Var             {Expr_PreMinus(Var $2)} 
-  | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)} /* FIXME */
+  | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)}
   | Token_LPar expr Token_RPar       {$2}
 
 %%

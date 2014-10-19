@@ -6,6 +6,15 @@ open ToyPrinter
 
 (** [eval_expr e s] évalue l'expression [e] dans l'environnement [s] *)
 let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
+  let eval_unop op e1 sigma =
+    let (v1, sigma') = eval_expr e1 sigma in
+    (op v1, sigma')
+  in
+  let eval_binop op e1 e2 sigma =
+     let (v1, sigma') = eval_expr e1 sigma in
+     let (v2, sigma'') = eval_expr e2 sigma' in
+     (op v1 v2, sigma'')
+  in
   match expr with
     | Expr_Num n -> (Utils.int_to_value n, sigma)
     | Expr_Var v -> begin
@@ -13,28 +22,16 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
 	    | Some x -> (x, sigma)
 	    | None -> failwith ("Uninitialized_Variable " ^ (v |> string_of_var))
 	 end
-    | Expr_Plus (e1, e2)
-	| Expr_Minus (e1, e2)
-	| Expr_Mult (e1, e2)
-	| Expr_Div (e1, e2)
-	| Expr_Equal (e1, e2)
-	| Expr_And (e1, e2)
-	| Expr_Less (e1, e2) -> begin
-      let op =
-        match expr with
-        | Expr_Plus _ -> lift_binop (+)
-        | Expr_Minus _ -> lift_binop (-)
-        | Expr_Mult _ -> lift_binop ( * )
-        | Expr_Div _ -> lift_binop (/)
-        | Expr_Equal _ -> lift_binop_bool_int (=)
-        | Expr_And _ -> lift_binop_bool_bool (&&)
-        | Expr_Less _ -> lift_binop_bool_int (<)
-        | _ -> failwith "Impossible!"
-      in
-      let (v1, sigma') = eval_expr e1 sigma in
-      let (v2, sigma'') = eval_expr e2 sigma' in
-      (op v1 v2, sigma'')
-    end
+    | Expr_Plus (e1, e2) -> eval_binop (lift_binop (+)) e1 e2 sigma
+	| Expr_Minus (e1, e2) -> eval_binop (lift_binop (-)) e1 e2 sigma
+	| Expr_Mult (e1, e2) -> eval_binop (lift_binop ( * )) e1 e2 sigma
+	| Expr_Div (e1, e2) -> eval_binop (lift_binop (/)) e1 e2 sigma
+	| Expr_Not e1 -> eval_unop (lift_unop_bool not) e1 sigma
+	| Expr_And (e1, e2) -> eval_binop (lift_binop_bool_bool (&&)) e1 e2 sigma
+	| Expr_Or (e1, e2) -> eval_binop (lift_binop_bool_bool (||)) e1 e2 sigma
+	| Expr_Equal (e1, e2) -> eval_binop (lift_binop_bool_int (=)) e1 e2 sigma
+	| Expr_NotEqual (e1, e2) -> eval_binop (lift_binop_bool_int (<>)) e1 e2 sigma
+	| Expr_Less (e1, e2) -> eval_binop (lift_binop_bool_int (<)) e1 e2 sigma
     | Expr_PostPlus v
     | Expr_PostMinus v ->
       let op =
@@ -50,8 +47,8 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_EAssign (v, e) ->
 	  let (v1, sigma') = eval_expr e sigma in
 	  (v1, (update_env v v1 sigma'))
-    | _ -> raise Unsupported_Expression
-    
+	| Expr_Unsupported -> failwith "Unsupported expression."
+
 (** Type des configurations d'exécution *)
 type outcome =
   | Continue of prog * ToyEnv.env

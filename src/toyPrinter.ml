@@ -57,6 +57,14 @@ let output_expr : expr -> out_channel -> unit =
       op
       (paren_close ctxt prio)      
   in
+  let print_unopg2 f ctxt prio op l oc =
+      fprintf oc
+      "%t%s%t%t"
+      (paren_open ctxt prio)
+      op
+      (f prio l)
+      (paren_close ctxt prio)       
+  in
   let print_unopg f ctxt prio op r oc =
       fprintf oc
       "%t%s%s%t"
@@ -81,9 +89,15 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_Minus(e,f) -> print_binop aux ctxt Prio_Plus " - " e f
   | Expr_Mult(e,f) -> print_binop aux ctxt Prio_Mult " × " e f
   | Expr_Div(e,f) -> print_binop aux ctxt Prio_Mult " / " e f
-  | Expr_Equal(e,f) -> print_binop aux ctxt Prio_Comp " = " e f
+  | Expr_Not(s) -> print_unopg2 aux ctxt Prio_Not " ~ " s
   | Expr_And(e,f) -> print_binop aux ctxt Prio_And " && " e f
+  | Expr_Or(e,f) -> print_binop aux ctxt Prio_Or " || " e f
+  | Expr_Equal(e,f) -> print_binop aux ctxt Prio_Comp " = " e f
+  | Expr_NotEqual(e,f) -> print_binop aux ctxt Prio_Comp " <> " e f
   | Expr_Less(e,f) -> print_binop aux ctxt Prio_Comp " < " e f
+  | Expr_LessEqual(e,f) -> print_binop aux ctxt Prio_Comp " <= " e f
+  | Expr_Greater(e,f) -> print_binop aux ctxt Prio_Comp " > " e f
+  | Expr_GreaterEqual(e,f) -> print_binop aux ctxt Prio_Comp " >= " e f
   | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_Unary "++ " s
   | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_Unary "-- " s
   | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
