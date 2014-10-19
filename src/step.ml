@@ -63,11 +63,6 @@ let env_of_outcome = function
 
 let add_tau x = (Tau, x)
 
-let print_label = function
-      | Label l -> print_string l; print_newline ()
-      | _ -> failwith "plop"
-      
-
 (** Relation de transition SOS de TOY. L'appel [step (p,s)] exécute un
     petit pas *)
 let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
@@ -145,6 +140,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
 let rec run (p, sigma) : ToyEnv.env =
   print_env sigma;
   let label, outcome = step (p, sigma) in
+  "↓ " ^ (label |> string_of_label) ^ "\n" |> print_string;
   match label with
   | Tau -> begin
     match outcome with
@@ -152,9 +148,9 @@ let rec run (p, sigma) : ToyEnv.env =
     | Finished sigma' -> print_env sigma'; sigma'
   end
   | Label l -> begin
-    "Exception: " ^ l ^ "\n" |> print_string;
     let sigma' = outcome |> env_of_outcome in
     print_env sigma';
+    "Exception: " ^ l ^ "\n" |> print_string;
     sigma'
   end
 

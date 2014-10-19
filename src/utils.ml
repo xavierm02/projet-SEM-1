@@ -87,7 +87,9 @@ let parse source =
     ToyParser.make_prog ToyLexer.make_token (Lexing.from_channel ch)
   )
 
-
+let string_of_label = function
+  | Tau -> "τ"
+  | Label l -> l
 
 let (|>) x f = f x
 let (%>) f g x = x |> f |> g
