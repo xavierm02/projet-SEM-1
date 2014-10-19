@@ -1,8 +1,10 @@
+P?=exemples/fact.toy
+
 all:
 	ocamlbuild toy.native
 
 test: all
-	./toy.native exemples/fact.toy
+	./toy.native $(P)
 
 clean:
 	ocamlbuild -clean
