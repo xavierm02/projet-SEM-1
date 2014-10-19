@@ -61,7 +61,7 @@ prog:
 
   | Token_Var Token_Assign expr          {Assign(Var($1),$3)}
 
-  | Token_While expr
+  | Token_While bexpr
       Token_Do prog2 Token_End
                                          {While($2,$4)}
 
@@ -70,7 +70,7 @@ prog:
       Token_Do prog2 Token_End
                                          {Unsupported} /* FIXME */
 
-  | Token_If expr
+  | Token_If bexpr
       Token_Then prog2
       Token_Else prog2 Token_End
                                          {If($2,$4,$6)}
@@ -84,20 +84,26 @@ prog:
 
   | Token_Raise Token_Var                {Raise($2)}
 
+bexpr:
+  | bexpr Token_And bexpr              {BExpr_And($1, $3)} /* FIXME */
+  | bexpr Token_Or  bexpr              {BExpr_Unsupported} /* FIXME */
+  | expr Token_Equal expr            {BExpr_Equal($1,$3)}
+  | expr Token_NotEqual expr         {BExpr_Unsupported} /* FIXME */
+  | expr Token_Less expr             {BExpr_Less($1,$3)}
+  | expr Token_LessEqual expr        {BExpr_Unsupported} /* FIXME */
+  | expr Token_Greater expr          {BExpr_Unsupported} /* FIXME */
+  | expr Token_GreaterEqual expr     {BExpr_Unsupported} /* FIXME */
+  | Token_Not bexpr                   {BExpr_Unsupported} /* FIXME */
+  /*| Token_Num                        {BExpr_Num($1)}*/
+  | Token_Var                        {BExpr_Var(Var $1)}
+  | Token_Var Token_EAssign bexpr     {BExpr_EAssign(Var $1,$3)} /* FIXME */
+  | Token_LPar bexpr Token_RPar       {$2}
+
 expr:
-  | expr Token_And expr              {Expr_And($1, $3)} /* FIXME */
-  | expr Token_Or  expr              {Expr_Unsupported} /* FIXME */
-  | expr Token_Equal expr            {Expr_Equal($1,$3)}
-  | expr Token_NotEqual expr         {Expr_Unsupported} /* FIXME */
-  | expr Token_Less expr             {Expr_Less($1,$3)}
-  | expr Token_LessEqual expr        {Expr_Unsupported} /* FIXME */
-  | expr Token_Greater expr          {Expr_Unsupported} /* FIXME */
-  | expr Token_GreaterEqual expr     {Expr_Unsupported} /* FIXME */
   | expr Token_Plus expr             {Expr_Plus($1,$3)}
   | expr Token_Minus expr            {Expr_Plus($1,$3)} 
   | expr Token_Mult expr             {Expr_Mult($1,$3)}
   | expr Token_Div expr              {Expr_Div($1,$3)}
-  | Token_Not expr                   {Expr_Unsupported} /* FIXME */
   | Token_Plus  expr %prec UnarySign {$2}
   | Token_Minus expr %prec UnarySign {$2} /* FIXME */
   | Token_Num                        {Expr_Num($1)}

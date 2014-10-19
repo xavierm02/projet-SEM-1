@@ -16,9 +16,6 @@ type expr =
   | Expr_Minus of (expr * expr)
   | Expr_Mult of (expr * expr)
   | Expr_Div of (expr * expr)
-  | Expr_Equal of (expr * expr)
-  | Expr_And of (expr * expr)
-  | Expr_Less of (expr * expr)
   | Expr_PostPlus of var
   | Expr_PostMinus of var
   | Expr_PrePlus of var
@@ -26,13 +23,22 @@ type expr =
   | Expr_EAssign of (var * expr)
   | Expr_Unsupported
 
+type bexpr =
+  (*| Expr_Num of int*)
+  | BExpr_Var of var
+  | BExpr_Equal of (expr * expr)
+  | BExpr_And of (bexpr * bexpr)
+  | BExpr_Less of (expr * expr)
+  | BExpr_EAssign of (var * bexpr)
+  | BExpr_Unsupported
+
 (** Type des programmes TOY *)
 type prog =
   | Skip
   | Assign of (var * expr)
   | Seq of (prog * prog)
-  | If of (expr * prog * prog)
-  | While of (expr * prog)
+  | If of (bexpr * prog * prog)
+  | While of (bexpr * prog)
   | Print of (expr)
   | Try of (prog * label * prog)
   | Raise of (string)
