@@ -127,6 +127,15 @@ let output_prog : prog -> out_channel -> unit =
       (output_expr cond)
       (aux (ind + 1)) body
       (indented ind) "end"
+  | For(var, expr1, expr2, body) ->
+      fprintf oc "%a %t := %t to %t\n%a\n%a\n%a"
+      (indented ind) "For"
+      (output_var var)
+      (output_expr expr1)
+      (output_expr expr2)
+      (indented ind) "do"
+      (aux (ind + 1)) body
+      (indented ind) "end"
   | Print(e) ->
       fprintf oc "%a %t"
       (indented ind) "print"

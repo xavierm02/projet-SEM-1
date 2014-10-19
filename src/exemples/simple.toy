@@ -1,4 +1,8 @@
 x := 1;
-y := 2;
+for i = 5 to 30 do
+y := (x<-x+2);
+x := 3
+end;
 print x;
 print y
+

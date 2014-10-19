@@ -33,6 +33,7 @@ type prog =
   | Seq of (prog * prog)
   | If of (expr * prog * prog)
   | While of (expr * prog)
+  | For of (var * expr * expr * prog)
   | Print of (expr)
   | Try of (prog * label * prog)
   | Raise of (string)

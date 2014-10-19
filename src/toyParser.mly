@@ -68,7 +68,7 @@ prog:
   | Token_For Token_Var Token_Equal
       expr Token_To expr
       Token_Do prog2 Token_End
-                                         {Unsupported} /* FIXME */
+                                         {For(Var $2, $4, $6, $8)}
 
   | Token_If expr
       Token_Then prog2

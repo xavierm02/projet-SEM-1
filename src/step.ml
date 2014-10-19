@@ -82,6 +82,15 @@ let rec step (p, (sigma: ToyEnv.env)) : outcome =
     else
 	  Finished sigma'
   end
+  | For (var, e1, e2, p1) -> begin
+    let (v1, sigma1 ) = (eval_expr e1 sigma) in
+    let sigma2 = update_env var v1 sigma in
+    let (v2, sigma3 ) = (eval_expr e2 sigma2) in
+    if (value_to_int v1) < (value_to_int v2) then
+      Continue (Seq (p1, For(var, Expr_PrePlus(var), e2, p1)), sigma3)
+    else
+    Finished sigma3
+  end 
   | Print expr -> begin
     print_string "> ";
     let (v1, sigma' ) = (eval_expr expr sigma) in
