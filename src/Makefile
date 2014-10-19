@@ -1,20 +1,15 @@
-all: toy.native
+all:
+	ocamlbuild toy.native
 
 clean:
 	ocamlbuild -clean
 
-top: itoy.top
+top:
+	ocamlbuild itoy.top
 	rlwrap ./itoy.top -I _build
 
-doc: toy.docdir
+doc:
+	ocamlbuild -docflags -charset,utf-8 toy.docdir/index.html
 
 .PHONY: all clean top doc
-
-toy.native: toy.ml
-	ocamlbuild $@
-
-itoy.top:
-	ocamlbuild $@
-
-toy.docdir:
-	ocamlbuild -docflags -charset,utf-8 toy.docdir/index.html
+	

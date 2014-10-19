@@ -1,4 +1,5 @@
 open ToyTypes
+open Utils
 
 module M = Map.Make(String)
 
@@ -12,7 +13,7 @@ let update_env (Var x) v e = M.add x v e
 
 let init_env = M.empty
 
-let print_env e =
+let string_of_env e =
   "{ " ^
   M.fold ToyPrinter.(fun k v s ->
     Printf.sprintf "%s ↦ %s; %s"
@@ -20,3 +21,6 @@ let print_env e =
     (string_of_value v)
   s) e "}"
 
+let print_env e =
+	e |> string_of_env |> print_string;
+	print_newline ()

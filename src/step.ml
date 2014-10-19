@@ -60,9 +60,10 @@ let rec step (p, (sigma: ToyEnv.env)) : outcome =
 
 (** Fermeture reflexive-transitive de [step] *)
 let rec run (p, sigma) : ToyEnv.env =
+  print_env sigma;
   match step (p, sigma) with
   | Continue (p', sigma') -> run (p', sigma')
-  | Finished sigma' -> sigma'
+  | Finished sigma' -> print_env sigma'; sigma'
 
 (** [go_step filename] interpréte le programme TOY représenté en
     syntaxe concrète dans le fichier de nom [filename]. *)
@@ -75,4 +76,4 @@ let go_step file =
   print_line ();
   let _ = run (prog, ToyEnv.init_env) in
   print_line ();
-  print_endline "Program stopped!"
+  print_endline "Program stopped."

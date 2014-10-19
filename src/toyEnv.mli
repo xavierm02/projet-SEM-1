@@ -14,6 +14,8 @@ val update_env : var -> value -> env -> env
 (** [init_env] est l'environnement initial *)
 val init_env : env
 
-(** [print_env e] construit une représentation lisible de l'environnement [e] *)
-val print_env : env -> string
+(** [string_of_env e] construit une représentation lisible de l'environnement [e] *)
+val string_of_env : env -> string
 
+(** [string_of_env e] affiche une représentation lisible de l'environnement [e] *)
+val print_env : env -> unit
