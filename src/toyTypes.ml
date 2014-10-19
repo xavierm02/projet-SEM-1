@@ -23,7 +23,7 @@ type expr =
   | Expr_PostMinus of var
   | Expr_PrePlus of var
   | Expr_PreMinus of var
-  | Expr_Eassign of (var * expr)
+  | Expr_EAssign of (var * expr)
   | Expr_Unsupported
 
 (** Type des programmes TOY *)

@@ -88,7 +88,7 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_Unary "-- " s
   | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
-  | Expr_Eassign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
+  | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN

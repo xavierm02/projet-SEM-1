@@ -27,6 +27,11 @@ let value_to_bool v =
 (** [value0] est la constante 0 de TOY *)
 let value0 = int_to_value 0
 
+let lift_unop op v =
+  match v with
+  | Int n -> Int (op n)
+  | _ -> failwith "cannot apply operator to boolean"
+
 (** [lift_binop op v w] relève l'opérateur [op] sur les valeurs TOY *)
 let lift_binop op v w =
   match v, w with

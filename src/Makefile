@@ -1,6 +1,9 @@
 all:
 	ocamlbuild toy.native
 
+test: all
+	./toy.native exemples/fact.toy
+
 clean:
 	ocamlbuild -clean
 
@@ -11,5 +14,5 @@ top:
 doc:
 	ocamlbuild -docflags -charset,utf-8 toy.docdir/index.html
 
-.PHONY: all clean top doc
+.PHONY: all test clean top doc
 	

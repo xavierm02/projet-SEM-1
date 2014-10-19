@@ -106,7 +106,7 @@ expr:
   | Token_Var Token_Decr             {Expr_PostMinus(Var $1)} 
   | Token_Incr Token_Var             {Expr_PrePlus(Var $2)} 
   | Token_Decr Token_Var             {Expr_PreMinus(Var $2)} 
-  | Token_Var Token_EAssign expr     {Expr_Eassign(Var $1,$3)} /* FIXME */
+  | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)} /* FIXME */
   | Token_LPar expr Token_RPar       {$2}
 
 %%
