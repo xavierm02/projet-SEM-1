@@ -2,11 +2,12 @@
 open ToyTypes
 
 (** {2 Fonctions utiles pour la manipulations des valeurs TOY} *)
-
+let print_bool b = print_string (string_of_bool b)
 (** [print_value v] affiche la valeur [v] sur la sortie standard. *)
 let print_value v =
   match v with
   | Int(n) -> print_int n
+  | Bool(b) -> print_bool b
 
 (** [int_to_value i] convertit l'entier [i] en valeur TOY. *)
 let int_to_value n = Int(n)
@@ -15,6 +16,13 @@ let int_to_value n = Int(n)
 let value_to_int v =
   match v with
   | Int(n) -> n
+  | _ -> failwith"called value_to_int for boolean value"
+
+let value_to_bool v =
+  match v with
+  | Bool(b) -> b
+  | _ -> failwith"called value_to_int for boolean value"
+
 
 (** [value0] est la constante 0 de TOY *)
 let value0 = int_to_value 0
@@ -23,11 +31,18 @@ let value0 = int_to_value 0
 let lift_binop op v w =
   match v, w with
   | Int(n), Int(m) -> Int(op n m)
+  | _ -> failwith"cannot apply operation to boolean"
 
-let lift_binop_bool op v w =
+let lift_binop_bool_int op v w =
   match v, w with
-  | Int(n), Int(m) -> Int(if op n m then 1 else 0)
+  | Int(n), Int(m) -> Bool(op n m)
+  | _ -> failwith"you way apply lift_binop_bool_int to integer only" 
 
+let lift_binop_bool_bool op v w =
+  match v, w with
+  | Bool(n), Bool(m) -> Bool(op n m)
+  | _ -> failwith"you way apply lift_binop_bool_bool to boolean only" 
+ 
 (** {2 Fonctions d'entrée/sortie fichiers} *)
 
 (**/**)

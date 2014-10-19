@@ -11,6 +11,7 @@ let output_var (v: var) (oc: out_channel) : unit =
 let string_of_value : value -> string =
   function
   | Int(i) -> string_of_int i
+  | Bool(b) -> string_of_bool b
 
 let output_value (v: value) (oc: out_channel) : unit =
   fprintf oc "%s" (string_of_value v)
@@ -46,15 +47,48 @@ let output_expr : expr -> out_channel -> unit =
       (f prio l)
       op
       (f prio r)
-      (paren_close ctxt prio)
+      (paren_close ctxt prio)      
+  in
+  let print_unopd f ctxt prio op l oc =
+      fprintf oc
+      "%t%s%s%t"
+      (paren_open ctxt prio)
+      (string_of_var l)
+      op
+      (paren_close ctxt prio)      
+  in
+  let print_unopg f ctxt prio op r oc =
+      fprintf oc
+      "%t%s%s%t"
+      (paren_open ctxt prio)
+      op
+      (string_of_var r)
+      (paren_close ctxt prio)      
+  in
+  let print_binop2 f ctxt prio op l r oc =
+      fprintf oc
+      "%t%s%s%t%t"
+      (paren_open ctxt prio)
+      (string_of_var l)
+      op
+      (f prio r)
+      (paren_close ctxt prio)      
   in
   let rec aux ctxt = function
   | Expr_Var(s) -> output_var s
   | Expr_Num(i) -> output_value (Int i)
   | Expr_Plus(e,f) -> print_binop aux ctxt Prio_Plus " + " e f
+  | Expr_Minus(e,f) -> print_binop aux ctxt Prio_Plus " - " e f
   | Expr_Mult(e,f) -> print_binop aux ctxt Prio_Mult " × " e f
+  | Expr_Div(e,f) -> print_binop aux ctxt Prio_Mult " / " e f
   | Expr_Equal(e,f) -> print_binop aux ctxt Prio_Comp " = " e f
+  | Expr_And(e,f) -> print_binop aux ctxt Prio_And " && " e f
   | Expr_Less(e,f) -> print_binop aux ctxt Prio_Comp " < " e f
+  | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_Unary "++ " s
+  | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_Unary "-- " s
+  | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
+  | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
+  | Expr_Eassign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN
