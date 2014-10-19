@@ -22,25 +22,25 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
 	    | Some x -> (x, sigma)
 	    | None -> failwith ("Uninitialized_Variable " ^ (v |> string_of_var))
 	 end
-    | Expr_Plus (e1, e2) -> eval_binop (lift_binop (+)) e1 e2 sigma
-    | Expr_Minus (e1, e2) -> eval_binop (lift_binop (-)) e1 e2 sigma
-    | Expr_Mult (e1, e2) -> eval_binop (lift_binop ( * )) e1 e2 sigma
-    | Expr_Div (e1, e2) -> eval_binop (lift_binop (/)) e1 e2 sigma
-    | Expr_Not e1 -> eval_unop (lift_unop_bool not) e1 sigma
+    | Expr_Plus (e1, e2) -> eval_binop (lift_binop_int_int (+)) e1 e2 sigma
+    | Expr_Minus (e1, e2) -> eval_binop (lift_binop_int_int (-)) e1 e2 sigma
+    | Expr_Mult (e1, e2) -> eval_binop (lift_binop_int_int ( * )) e1 e2 sigma
+    | Expr_Div (e1, e2) -> eval_binop (lift_binop_int_int (/)) e1 e2 sigma
+    | Expr_Not e1 -> eval_unop (lift_unop_bool (not)) e1 sigma
     | Expr_And (e1, e2) -> eval_binop (lift_binop_bool_bool (&&)) e1 e2 sigma
     | Expr_Or (e1, e2) -> eval_binop (lift_binop_bool_bool (||)) e1 e2 sigma
-    | Expr_Equal (e1, e2) -> eval_binop (lift_binop_bool_int (=)) e1 e2 sigma
-    | Expr_NotEqual (e1, e2) -> eval_binop (lift_binop_bool_int (<>)) e1 e2 sigma
-    | Expr_Less (e1, e2) -> eval_binop (lift_binop_bool_int (<)) e1 e2 sigma
-    | Expr_LessEqual (e1, e2) -> eval_binop (lift_binop_bool_int (<=)) e1 e2 sigma
-    | Expr_Greater (e1, e2) -> eval_binop (lift_binop_bool_int (>)) e1 e2 sigma
-    | Expr_GreaterEqual (e1, e2) -> eval_binop (lift_binop_bool_int (>=)) e1 e2 sigma
+    | Expr_Equal (e1, e2) -> eval_binop (lift_binop_int_bool (=)) e1 e2 sigma
+    | Expr_NotEqual (e1, e2) -> eval_binop (lift_binop_int_bool (<>)) e1 e2 sigma
+    | Expr_Less (e1, e2) -> eval_binop (lift_binop_int_bool (<)) e1 e2 sigma
+    | Expr_LessEqual (e1, e2) -> eval_binop (lift_binop_int_bool (<=)) e1 e2 sigma
+    | Expr_Greater (e1, e2) -> eval_binop (lift_binop_int_bool (>)) e1 e2 sigma
+    | Expr_GreaterEqual (e1, e2) -> eval_binop (lift_binop_int_bool (>=)) e1 e2 sigma
     | Expr_PostPlus v
     | Expr_PostMinus v ->
       let op =
         match expr with
-        | Expr_PostPlus _ -> lift_unop ((+) 1)
-        | Expr_PostMinus _ -> lift_unop (fun x -> x - 1)
+        | Expr_PostPlus _ -> lift_unop_int ((+) 1)
+        | Expr_PostMinus _ -> lift_unop_int (fun x -> x - 1)
         | _ -> failwith "Impossible!"
       in
       let (v1, sigma') = eval_expr (Expr_Var v) sigma in
@@ -139,6 +139,11 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
 (** Fermeture reflexive-transitive de [step] *)
 let rec run (p, sigma) : ToyEnv.env =
   print_env sigma;
+   let string_of_label : label -> string =
+    function
+    | Tau -> "Tau"
+    | Label l -> l
+  in
   let label, outcome = step (p, sigma) in
   "↓ " ^ (label |> string_of_label) ^ "\n" |> print_string;
   match label with
