@@ -9,6 +9,10 @@ let print_value v =
   | Int(n) -> print_int n
   | Bool(b) -> print_bool b
 
+let string_of_value = function
+  | Int n -> string_of_int n
+  | Bool b -> string_of_bool b
+
 (** [int_to_value i] convertit l'entier [i] en valeur TOY. *)
 let int_to_value n = Int(n)
 
@@ -87,6 +91,18 @@ let parse source =
     ToyParser.make_prog ToyLexer.make_token (Lexing.from_channel ch)
   )
 
+let string_of_exception_label =
+  function
+  | Tau -> "Tau"
+  | Label l -> l
+
+let string_of_print_label = function
+  | None -> ""
+  | Some s -> "> " ^ (string_of_value s)
+  
+
+let string_of_label ((exception_label, print_label) : label) =
+  (string_of_exception_label exception_label) ^ " " ^ (string_of_print_label print_label)
 
 
 let (|>) x f = f x

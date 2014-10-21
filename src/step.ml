@@ -61,23 +61,24 @@ let env_of_outcome = function
   | Continue (_, sigma)
   | Finished sigma -> sigma
 
-let add_tau x = (Tau, x)
+let add_default_label x = ((Tau, None), x)
 
 (** Relation de transition SOS de TOY. L'appel [step (p,s)] exécute un
     petit pas *)
 let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
   match p with
-  | Skip -> Finished sigma |> add_tau
+  | Skip -> Finished sigma |> add_default_label
   | Assign (v, e) ->
     let (v1, sigma') = (eval_expr e sigma) in
-    Finished (update_env v v1 sigma') |> add_tau
-  | Seq (p1, p2) -> begin
+    Finished (update_env v v1 sigma') |> add_default_label
+  | Seq (p1, p2) -> begin (* TODO CONCAT PRINT *)
     let label, outcome = step (p1, sigma) in
-    match label with
+    let label_exception, label_print = label in
+    match label_exception with
     | Tau -> begin
       match outcome with
-      | Continue (p1', sigma') -> Continue (Seq (p1', p2), sigma') |> add_tau
-      | Finished sigma' -> Continue (p2, sigma') |> add_tau
+      | Continue (p1', sigma') -> (label, Continue (Seq (p1', p2), sigma'))
+      | Finished sigma' -> (label, Continue (p2, sigma'))
     end
     | Label _ -> begin
       (label, Finished (outcome |> env_of_outcome))
@@ -86,67 +87,61 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
   | If (e, p1, p2) -> 
     let (v1, sigma' ) = (eval_expr e sigma) in
     if (value_to_bool v1) then
-      Continue (p1, sigma') |> add_tau
+      Continue (p1, sigma') |> add_default_label
     else
-      Continue (p2, sigma') |> add_tau
+      Continue (p2, sigma') |> add_default_label
   | While (e, p1) -> begin
     let (v1, sigma' ) = (eval_expr e sigma) in
     if (value_to_bool v1) then
-      Continue (Seq (p1, p), sigma') |> add_tau
+      Continue (Seq (p1, p), sigma') |> add_default_label
     else
-      Finished sigma' |> add_tau
+      Finished sigma' |> add_default_label
   end
   | For (var, e1, e2, p1) -> begin
     let (v1, sigma1 ) = (eval_expr e1 sigma) in
     let (v2, sigma2 ) = (eval_expr e2 sigma1) in
     let sigma3 = update_env var v1 sigma1 in
     if (value_to_int v1) < (value_to_int v2) then
-      Continue (Seq (p1, For(var, Expr_PrePlus(var), Expr_Num (value_to_int v2), p1)), sigma3) |> add_tau
+      Continue (Seq (p1, For(var, Expr_PrePlus(var), Expr_Num (value_to_int v2), p1)), sigma3) |> add_default_label
     else if (value_to_int v1) > (value_to_int v2) then
-      Continue (Seq (p1, For(var, Expr_PreMinus(var), Expr_Num (value_to_int v2), p1)), sigma3) |> add_tau
+      Continue (Seq (p1, For(var, Expr_PreMinus(var), Expr_Num (value_to_int v2), p1)), sigma3) |> add_default_label
     else
-      Finished sigma3 |> add_tau
+      Finished sigma3 |> add_default_label
   end 
   | Print expr -> begin
-    print_string "> ";
     let (v1, sigma' ) = (eval_expr expr sigma) in
-    print_value v1;
-    print_newline ();
-    Finished sigma |> add_tau
+    ((Tau, Some v1), Finished sigma')
   end
   | Try (p1, try_label, p2) -> begin
     let label, outcome = step (p1, sigma) in
-    match label with
+    let label_exception, label_print = label in
+    match label_exception with
     | Tau -> begin
       match outcome with
-      | Continue (p1', sigma') -> Continue (Try (p1', try_label, p2), sigma') |> add_tau
-      | Finished sigma' -> Finished sigma' |> add_tau
+      | Continue (p1', sigma') -> (label, Continue (Try (p1', try_label, p2), sigma'))
+      | Finished sigma' -> (label, Finished sigma')
     end
     | Label _ -> begin
       let sigma' = outcome |> env_of_outcome in
-      if label = try_label then
-        Continue (p2, sigma') |> add_tau
+      if label_exception = try_label then
+        ((Tau, label_print), Continue (p2, sigma'))
       else
 	(label, Finished sigma')
     end
   end
-  | Raise l -> (Label l ,Finished sigma)
+  | Raise l -> ((Label l, None), Finished sigma)
   | Unsupported -> begin
     ToyPrinter.print_prog p;
-    raise Unsupported_Command |> add_tau
+    raise Unsupported_Command |> add_default_label
   end
 
 (** Fermeture reflexive-transitive de [step] *)
 let rec run (p, sigma) : ToyEnv.env =
   print_env sigma;
-   let string_of_label : label -> string =
-    function
-    | Tau -> "Tau"
-    | Label l -> l
-  in
   let label, outcome = step (p, sigma) in
   "↓ " ^ (label |> string_of_label) ^ "\n" |> print_string;
-  match label with
+  let label_exception, label_print = label in
+  match label_exception with
   | Tau -> begin
     match outcome with
     | Continue (p', sigma') -> run (p', sigma')

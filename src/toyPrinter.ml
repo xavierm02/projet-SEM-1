@@ -1,5 +1,6 @@
 open ToyTypes
 open Printf
+open Utils
 
 let string_of_var : var -> string =
   function
@@ -16,7 +17,7 @@ let string_of_value : value -> string =
 let output_value (v: value) (oc: out_channel) : unit =
   fprintf oc "%s" (string_of_value v)
 
-let output_label (l: label) (oc: out_channel) : unit =
+let output_label (l: label_exception) (oc: out_channel) : unit =
   match l with
   | Label(l) -> fprintf oc "%s" l
   | Tau -> fprintf oc "τ"

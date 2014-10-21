@@ -5,8 +5,17 @@
 (** Type des variables TOY *)
 type var = Var of string
 
+(** Type des valeurs TOY *)
+type value = 
+  | Int of int
+  | Bool of bool
+
+type label_exception = Tau | Label of string
+
+type label_print = value option
+
 (** Type des labels TOY *)
-type label = Tau | Label of string
+type label = label_exception * label_print
 
 (** Type des expressions TOY *)
 type expr =
@@ -41,16 +50,11 @@ type prog =
   | While of (expr * prog)
   | For of (var * expr * expr * prog)
   | Print of (expr)
-  | Try of (prog * label * prog)
+  | Try of (prog * label_exception * prog)
   | Raise of (string)
   | Unsupported
 
 (** {2 Valeurs sémantiques de TOY} *)
-
-(** Type des valeurs TOY *)
-type value = 
-  | Int of int
-  | Bool of bool
 
 exception Unsupported_Expression
 exception Uninitialized_Variable of var
