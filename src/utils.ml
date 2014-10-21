@@ -8,10 +8,16 @@ let print_value v =
   match v with
   | Int(n) -> print_int n
   | Bool(b) -> print_bool b
+  | String(s) -> print_string s
+  | Prog(p) -> print_string "<program>"
 
 let string_of_value = function
   | Int n -> string_of_int n
   | Bool b -> string_of_bool b
+  | String s -> s
+  | Prog p -> "<program>"
+
+let string_to_value s = String s
 
 (** [int_to_value i] convertit l'entier [i] en valeur TOY. *)
 let int_to_value n = Int(n)

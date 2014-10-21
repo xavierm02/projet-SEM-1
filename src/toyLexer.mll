@@ -12,6 +12,7 @@ let NUM = ['0'-'9']
 let ALPHA =  ['a'-'z' 'A'-'Z' '_' ]
 let WORD = ALPHA (ALPHA | '-' | NUM)*
 let NUMBER = '-'? ['0'-'9']+
+let STRING = '"' ([^'"'] | "\\\"")* '"'
 
 let ANY = _
 
@@ -35,6 +36,8 @@ let TRY = "try"
 let WITH = "with"
 let RAISE = "raise"
 let ARROW = "->"
+let PARSE = "parse"
+let EVAL = "eval"
 
 let PLUS = "+"
 let MINUS = "-"
@@ -87,7 +90,9 @@ rule make_token = parse
   | WITH                {Token_With}
   | ARROW               {Token_Arrow}
   | RAISE               {Token_Raise}
-
+  | PARSE               {Token_Parse}
+  | EVAL                {Token_Eval}
+  
   | PLUS                {Token_Plus}
   | MINUS               {Token_Minus}
   | TIMES               {Token_Mult}
@@ -117,7 +122,12 @@ rule make_token = parse
         let s = (Lexing.lexeme lexbuf)
         in Token_Var(s)
       }
-
+  
+  | STRING
+      {
+        let s = (Lexing.lexeme lexbuf) in
+        Token_String(s)
+      }
   | ANY (* Default case: just skip the character *)
       {
         let s = (Lexing.lexeme lexbuf)

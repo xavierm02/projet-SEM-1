@@ -20,7 +20,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_Var v -> begin
 	  match eval_env v sigma with
 	    | Some x -> (x, sigma)
-	    | None -> failwith ("Uninitialized_Variable " ^ (v |> string_of_var))
+	    | None -> failwith ("Uninitialized_Variable " ^ (v |> string_of_var) ^ "!")
 	 end
     | Expr_Plus (e1, e2) -> eval_binop (lift_binop_int_int (+)) e1 e2 sigma
     | Expr_Minus (e1, e2) -> eval_binop (lift_binop_int_int (-)) e1 e2 sigma
@@ -48,9 +48,19 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_PrePlus v -> eval_expr (Expr_EAssign (v, (Expr_Plus (Expr_Var v, Expr_Num 1)))) sigma
     | Expr_PreMinus v -> eval_expr (Expr_EAssign (v, (Expr_Minus (Expr_Var v, Expr_Num 1)))) sigma
     | Expr_EAssign (v, e) ->
-	  let (v1, sigma') = eval_expr e sigma in
-	  (v1, (update_env v v1 sigma'))
-	| Expr_Unsupported -> failwith "Unsupported expression."
+      let (v1, sigma') = eval_expr e sigma in
+      (v1, (update_env v v1 sigma'))
+    | Expr_String s -> (Utils.string_to_value s, sigma)
+    | Expr_Parse e -> begin
+      let (v1, sigma') = eval_expr e sigma in
+      match v1 with
+      | String s ->
+        let p = ToyParser.make_prog ToyLexer.make_token (Lexing.from_string s) in
+        (Prog p, sigma)
+      | _ -> failwith "Parse can only be applied to String values."
+    end
+    | Expr_Prog p -> (Prog p, sigma)
+    | Expr_Unsupported -> failwith "Unsupported expression!"
 
 (** Type des configurations d'exécution *)
 type outcome =
@@ -71,7 +81,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
   | Assign (v, e) ->
     let (v1, sigma') = (eval_expr e sigma) in
     Finished (update_env v v1 sigma') |> add_default_label
-  | Seq (p1, p2) -> begin (* TODO CONCAT PRINT *)
+  | Seq (p1, p2) -> begin
     let label, outcome = step (p1, sigma) in
     let label_exception, label_print = label in
     match label_exception with
@@ -130,6 +140,21 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
     end
   end
   | Raise l -> ((Label l, None), Finished sigma)
+  | Eval e -> begin
+    let (v1, sigma') = (eval_expr e sigma) in
+    match v1 with
+    | Prog p ->
+      let label, outcome = step (p, sigma') in
+      let label_exception, label_print = label in
+      match label_exception with
+      | Tau -> begin
+	match outcome with
+	| Continue (p', sigma'') -> (label, Continue (Eval (Expr_Prog p'), sigma''))
+	| Finished sigma'' -> (label, Finished sigma'')
+      end
+      | Label _ -> (label, Finished (outcome |> env_of_outcome))
+    | _ -> failwith "Eval can only be applied to Prog values!"
+  end
   | Unsupported -> begin
     ToyPrinter.print_prog p;
     raise Unsupported_Command |> add_default_label

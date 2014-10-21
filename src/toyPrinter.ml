@@ -13,6 +13,8 @@ let string_of_value : value -> string =
   function
   | Int(i) -> string_of_int i
   | Bool(b) -> string_of_bool b
+  | String s ->  "\"" ^ (String.escaped s) ^ "\""
+  | Prog p -> "<program>"
 
 let output_value (v: value) (oc: out_channel) : unit =
   fprintf oc "%s" (string_of_value v)
@@ -104,6 +106,8 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
   | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
+  | Expr_String(s) -> output_value (String s)
+  | Expr_Parse(s) -> print_unopg2 aux ctxt Prio_Unary " parse " s
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN
@@ -167,6 +171,10 @@ let output_prog : prog -> out_channel -> unit =
       fprintf oc "%a %s"
       (indented ind) "raise"
       e
+  | Eval e ->
+      fprintf oc "%a %t"
+      (indented ind) "eval"
+      (output_expr e)
   | Unsupported -> failwith "output_prog: unsupported program"
   in
   fun p oc -> aux 0 oc p

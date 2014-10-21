@@ -9,16 +9,18 @@ type var = Var of string
 type value = 
   | Int of int
   | Bool of bool
+  | String of string
+  | Prog of prog
 
-type label_exception = Tau | Label of string
+and label_exception = Tau | Label of string
 
-type label_print = value option
+and label_print = value option
 
 (** Type des labels TOY *)
-type label = label_exception * label_print
+and label = label_exception * label_print
 
 (** Type des expressions TOY *)
-type expr =
+and expr =
   | Expr_Num of int
   | Expr_Var of var
   | Expr_Plus of (expr * expr)
@@ -39,10 +41,13 @@ type expr =
   | Expr_PrePlus of var
   | Expr_PreMinus of var
   | Expr_EAssign of (var * expr)
+  | Expr_String of string
+  | Expr_Parse of expr
+  | Expr_Prog of prog
   | Expr_Unsupported
 
 (** Type des programmes TOY *)
-type prog =
+and prog =
   | Skip
   | Assign of (var * expr)
   | Seq of (prog * prog)
@@ -52,6 +57,7 @@ type prog =
   | Print of (expr)
   | Try of (prog * label_exception * prog)
   | Raise of (string)
+  | Eval of expr
   | Unsupported
 
 (** {2 Valeurs sémantiques de TOY} *)

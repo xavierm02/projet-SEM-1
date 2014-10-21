@@ -8,6 +8,7 @@
 
 %token <int> Token_Num
 %token <string> Token_Var
+%token <string> Token_String
 
 %token Token_Skip
 %token Token_Assign
@@ -17,6 +18,8 @@
 %token Token_Print
 %token Token_Try Token_With Token_Arrow
 %token Token_Raise
+%token Token_Parse
+%token Token_Eval
 
 %token Token_Incr Token_Decr
 %token Token_EAssign
@@ -83,6 +86,7 @@ prog:
                                          {Try($2,Label($4),$6)}
 
   | Token_Raise Token_Var                {Raise($2)}
+  | Token_Eval expr                 {Eval($2)}
 
 expr:
   | expr Token_And expr              {Expr_And($1, $3)}
@@ -108,5 +112,7 @@ expr:
   | Token_Decr Token_Var             {Expr_PreMinus(Var $2)} 
   | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)}
   | Token_LPar expr Token_RPar       {$2}
+  | Token_String                     {Expr_String(Scanf.unescaped(String.sub $1 1 ((String.length $1) - 2)))}
+  | Token_Parse expr                 {Expr_Parse($2)}
 
 %%
