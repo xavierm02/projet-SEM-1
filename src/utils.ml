@@ -99,7 +99,7 @@ let parse source =
 
 let string_of_exception_label =
   function
-  | Tau -> "Tau"
+  | Tau -> "τ"
   | Label l -> l
 
 let string_of_print_label = function
