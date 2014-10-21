@@ -1,20 +1,30 @@
-P?=exemples/fact.toy
+P?=exemples/*
 
-all:
-	ocamlbuild toy.native
+all: toy_interp top_top
 
-test: all
-	./toy.native $(P)
+toy_interp: toy.native
+
+toy_top: itoy.top
+
+runtop:
+	rlwrap ./itoy.top -I _build
+
+test: toy.native
+	./$< $(P)
 
 clean:
 	ocamlbuild -clean
 
-top:
-	ocamlbuild itoy.top
-	rlwrap ./itoy.top -I _build
-
 doc:
 	ocamlbuild -docflags -charset,utf-8 toy.docdir/index.html
 
-.PHONY: all test clean top doc
+demo:
+	@echo ./demo is a script. You don\'t need to build it.
+
+.PHONY: all toy_interp toy_top runtop test clean doc demo
 	
+toy.native:
+	ocamlbuild $@
+
+itoy.top:
+	ocamlbuild $@
