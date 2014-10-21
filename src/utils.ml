@@ -11,10 +11,18 @@ let print_value v =
   | String(s) -> print_string s
   | Prog(p) -> print_string "<program>"
 
-let string_of_value = function
+let value_to_string = function
   | Int n -> string_of_int n
   | Bool b -> string_of_bool b
   | String s -> s
+  | Prog p -> "<program>"
+
+(** [string_of_value v] construit la chaîne représentant la valeur [v] *)
+let string_of_value : value -> string =
+  function
+  | Int(i) -> string_of_int i
+  | Bool(b) -> string_of_bool b
+  | String s ->  "\"" ^ (String.escaped s) ^ "\""
   | Prog p -> "<program>"
 
 let string_to_value s = String s

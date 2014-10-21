@@ -14,6 +14,8 @@ let WORD = ALPHA (ALPHA | '-' | NUM)*
 let NUMBER = '-'? ['0'-'9']+
 let STRING = '"' ([^'"'] | "\\\"")* '"'
 
+let CONS = "^"
+
 let ANY = _
 
 let LPAR = "("
@@ -110,7 +112,9 @@ rule make_token = parse
   | INCR                {Token_Incr}
   | DECR                {Token_Decr}
   | EASSIGN             {Token_EAssign}
-
+  
+  | CONS                {Token_Cons}
+  
   | NUMBER
     {
       let s = (Lexing.lexeme lexbuf)

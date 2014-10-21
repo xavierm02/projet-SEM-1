@@ -44,6 +44,7 @@ and expr =
   | Expr_String of string
   | Expr_Parse of expr
   | Expr_Prog of prog
+  | Expr_Cons of (expr * expr)
   | Expr_Unsupported
 
 (** Type des programmes TOY *)

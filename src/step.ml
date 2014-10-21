@@ -60,6 +60,8 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
       | _ -> failwith "Parse can only be applied to String values."
     end
     | Expr_Prog p -> (Prog p, sigma)
+    | Expr_Cons (e1, e2) ->
+      eval_binop (fun v1 v2 -> String ((value_to_string v1) ^ (value_to_string v2))) e1 e2 sigma
     | Expr_Unsupported -> failwith "Unsupported expression!"
 
 (** Type des configurations d'exécution *)
@@ -143,7 +145,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
   | Eval e -> begin
     let (v1, sigma') = (eval_expr e sigma) in
     match v1 with
-    | Prog p ->
+    | Prog p -> begin
       let label, outcome = step (p, sigma') in
       let label_exception, label_print = label in
       match label_exception with
@@ -153,6 +155,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
 	| Finished sigma'' -> (label, Finished sigma'')
       end
       | Label _ -> (label, Finished (outcome |> env_of_outcome))
+    end
     | _ -> failwith "Eval can only be applied to Prog values!"
   end
   | Unsupported -> begin
