@@ -1,4 +1,1 @@
-x := "z := \"test\"";
-y := parse x;
-eval y;
-print z
+p := "print (\"p := \\\"\" ^ (escape p) ^ \"\\\"\"); print p"; print ("p := \"" ^ (escape p) ^ "\""); print p

@@ -112,7 +112,7 @@ let string_of_exception_label =
 
 let string_of_print_label = function
   | None -> ""
-  | Some s -> "> " ^ (string_of_value s)
+  | Some s -> "> " ^ (value_to_string s)
   
 
 let string_of_label ((exception_label, print_label) : label) =

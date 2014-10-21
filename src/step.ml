@@ -50,7 +50,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_EAssign (v, e) ->
       let (v1, sigma') = eval_expr e sigma in
       (v1, (update_env v v1 sigma'))
-    | Expr_String s -> (Utils.string_to_value s, sigma)
+    | Expr_String s -> (*"@@@" ^ s ^ "\n###" |> print_string;*)(Utils.string_to_value (s), sigma)
     | Expr_Parse e -> begin
       let (v1, sigma') = eval_expr e sigma in
       match v1 with
@@ -62,6 +62,10 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_Prog p -> (Prog p, sigma)
     | Expr_Cons (e1, e2) ->
       eval_binop (fun v1 v2 -> String ((value_to_string v1) ^ (value_to_string v2))) e1 e2 sigma
+    | Expr_Escape e1 ->
+      eval_unop (fun v1 -> String (String.escaped (value_to_string v1))) e1 sigma
+    | Expr_Unescape e1 ->
+      eval_unop (fun v1 -> String (Scanf.unescaped (value_to_string v1))) e1 sigma
     | Expr_Unsupported -> failwith "Unsupported expression!"
 
 (** Type des configurations d'exécution *)

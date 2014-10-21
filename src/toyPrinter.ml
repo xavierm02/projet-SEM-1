@@ -107,6 +107,8 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_Parse(s) -> print_unopg2 aux ctxt Prio_Unary " parse " s
   | Expr_Prog(s) -> output_string "<program>"
   | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Cons " ^ " e f
+  | Expr_Escape(s) -> print_unopg2 aux ctxt Prio_Unary " escape " s
+  | Expr_Unescape(s) -> print_unopg2 aux ctxt Prio_Unary " unescape " s
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN

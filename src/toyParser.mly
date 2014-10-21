@@ -25,6 +25,8 @@
 %token Token_EAssign
 
 %token Token_Cons
+%token Token_Escape
+%token Token_Unescape
 
 %token Token_Plus Token_Minus
 %token Token_Mult Token_Div
@@ -116,6 +118,7 @@ expr:
   | Token_LPar expr Token_RPar       {$2}
   | Token_String                     {Expr_String(Scanf.unescaped(String.sub $1 1 ((String.length $1) - 2)))}
   | Token_Parse expr                 {Expr_Parse($2)}
-  | expr Token_Cons expr              {Expr_Cons($1, $3)}
-
+  | expr Token_Cons expr             {Expr_Cons($1, $3)}
+  | Token_Escape expr                {Expr_Escape($2)}
+  | Token_Unescape expr                {Expr_Unescape($2)}
 %%

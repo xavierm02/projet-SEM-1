@@ -12,9 +12,11 @@ let NUM = ['0'-'9']
 let ALPHA =  ['a'-'z' 'A'-'Z' '_' ]
 let WORD = ALPHA (ALPHA | '-' | NUM)*
 let NUMBER = '-'? ['0'-'9']+
-let STRING = '"' ([^'"'] | "\\\"")* '"'
+let STRING = '"' (('\092' ('\092' | [^ '\092'])) | ([^ '"' '\092']))* '"'
 
 let CONS = "^"
+let ESCAPE = "escape"
+let UNESCAPE = "unescape"
 
 let ANY = _
 
@@ -114,6 +116,8 @@ rule make_token = parse
   | EASSIGN             {Token_EAssign}
   
   | CONS                {Token_Cons}
+  | ESCAPE              {Token_Escape}
+  | UNESCAPE              {Token_Unescape}
   
   | NUMBER
     {
