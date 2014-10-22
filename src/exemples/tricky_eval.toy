@@ -1,0 +1,12 @@
+i := 3;
+dec_j := "j := j - 1;";
+pj := "skip";
+p := "
+  j := i;
+  pj := dec_j ^ pj;
+  eval parse(pj);
+  if j >= 0 then
+    eval parse(p ^ \"\")
+  end
+";
+eval parse(p)

@@ -22,6 +22,14 @@ let string_of_value : value -> string =
   | String s ->  "\"" ^ (String.escaped s) ^ "\""
   | Prog p -> default_string_of_prog p
 
+let string_of_value_2 : value -> string =
+  function
+  | Int(i) -> string_of_int i
+  | Bool(b) -> string_of_bool b
+  | String s ->  "\"" ^ (String.escaped s |> Str.split_delim (Str.regexp_string "\\n") |> String.concat "\n") ^ "\""
+  | Prog p -> default_string_of_prog p
+
+
 (** [print_value v] affiche la valeur [v] sur la sortie standard. *)
 let print_value = string_of_value %> print_string
 
@@ -56,7 +64,7 @@ let output_var (v: var) (oc: out_channel) : unit =
   fprintf oc "%s" (string_of_var v)
 
 let output_value (v: value) (oc: out_channel) : unit =
-  fprintf oc "%s" (string_of_value v)
+  fprintf oc "%s" (string_of_value_2 v)
 
 let output_label (l: label_exception) (oc: out_channel) : unit =
   match l with
@@ -155,7 +163,7 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
   | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
   | Expr_String(s) -> output_value (String s)
-  | Expr_Parse(s) -> print_unopg2 aux ctxt Prio_Unary "parse " s
+  | Expr_Parse(s) -> print_fun aux ctxt Prio_Unary "parse" s
   | Expr_Prog(s) -> output_string "<program>"
   | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Plus " ^ " e f
   | Expr_Escape(s) -> print_fun aux ctxt Prio_Unary "escape" s

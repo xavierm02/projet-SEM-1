@@ -81,7 +81,9 @@ prog:
       Token_Then prog2
       Token_Else prog2 Token_End
                                          {If($2,$4,$6)}
-
+  | Token_If expr
+      Token_Then prog2 Token_End
+                                         {If($2,$4,Skip)}
   | Token_Print expr                     {Print($2)}
 
   | Token_Try prog2
@@ -102,7 +104,7 @@ expr:
   | expr Token_Greater expr          {Expr_Greater($1,$3)}
   | expr Token_GreaterEqual expr     {Expr_GreaterEqual($1,$3)}
   | expr Token_Plus expr             {Expr_Plus($1,$3)}
-  | expr Token_Minus expr            {Expr_Plus($1,$3)} 
+  | expr Token_Minus expr            {Expr_Minus($1,$3)} 
   | expr Token_Mult expr             {Expr_Mult($1,$3)}
   | expr Token_Div expr              {Expr_Div($1,$3)}
   | Token_Not expr                   {Expr_Not($2)}
@@ -117,7 +119,7 @@ expr:
   | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)}
   | Token_LPar expr Token_RPar       {$2}
   | Token_String                     {Expr_String(Scanf.unescaped(String.sub $1 1 ((String.length $1) - 2)))}
-  | Token_Parse expr                 {Expr_Parse($2)}
+  | Token_Parse Token_LPar expr Token_RPar                {Expr_Parse($3)}
   | expr Token_Cons expr             {Expr_Cons($1, $3)}
   | Token_Escape Token_LPar expr Token_RPar               {Expr_Escape($3)}
   | Token_Unescape Token_LPar expr Token_RPar               {Expr_Unescape($3)}
