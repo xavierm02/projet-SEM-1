@@ -29,7 +29,6 @@
 
 %token Token_Cons
 %token Token_Escape
-%token Token_Unescape
 
 %token Token_Plus Token_Minus
 %token Token_Mult Token_Div
@@ -127,5 +126,4 @@ expr:
   | Token_Parse Token_LPar expr Token_RPar                {Expr_Parse($3)}
   | expr Token_Cons expr             {Expr_Cons($1, $3)}
   | Token_Escape Token_LPar expr Token_RPar               {Expr_Escape($3)}
-  | Token_Unescape Token_LPar expr Token_RPar               {Expr_Unescape($3)}
 %%

@@ -16,7 +16,6 @@ let STRING = '"' (('\092' ('\092' | [^ '\092'])) | ([^ '"' '\092']))* '"'
 
 let CONS = "^"
 let ESCAPE = "escape"
-let UNESCAPE = "unescape"
 
 let TRUE = "true"
 let FALSE = "false"
@@ -120,7 +119,6 @@ rule make_token = parse
   
   | CONS                {Token_Cons}
   | ESCAPE              {Token_Escape}
-  | UNESCAPE              {Token_Unescape}
   
   | TRUE                {Token_True}
   | FALSE               {Token_False}

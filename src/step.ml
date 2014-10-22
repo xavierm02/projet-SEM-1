@@ -71,8 +71,6 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
       eval_binop (fun v1 v2 -> String ((value_to_string v1) ^ (value_to_string v2))) e1 e2 sigma
     | Expr_Escape e1 ->
       eval_unop (fun v1 -> String (String.escaped (value_to_string v1))) e1 sigma
-    | Expr_Unescape e1 ->
-      eval_unop (fun v1 -> String (Scanf.unescaped (value_to_string v1))) e1 sigma
     | Expr_Bool b -> (Value2 (Bool b), sigma)
     | Expr_Unsupported -> failwith "Unsupported expression!"
 
