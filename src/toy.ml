@@ -12,4 +12,5 @@ let () =
     tmp ^
     "\n" |> print_string;
     Step.go_step file;
+    print_newline (); print_newline (); print_newline (); print_newline (); print_newline ();
   )

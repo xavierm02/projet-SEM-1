@@ -157,8 +157,8 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_LessEqual(e,f) -> print_binop aux ctxt Prio_Comp " <= " e f
   | Expr_Greater(e,f) -> print_binop aux ctxt Prio_Comp " > " e f
   | Expr_GreaterEqual(e,f) -> print_binop aux ctxt Prio_Comp " >= " e f
-  | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_Unary "++ " s
-  | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_Unary "-- " s
+  | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_MIN "++ " s
+  | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_MIN "-- " s
   | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
   | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
@@ -167,7 +167,7 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_Prog(s) -> output_string "<program>"
   | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Plus " ^ " e f
   | Expr_Escape(s) -> print_fun aux ctxt Prio_Unary "escape" s
-  | Expr_Unescape(s) -> print_fun aux ctxt Prio_Unary "unescape" s
+  | Expr_Bool(s) -> output_value (Bool s)
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN

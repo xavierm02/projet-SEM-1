@@ -10,6 +10,9 @@
 %token <string> Token_Var
 %token <string> Token_String
 
+%token Token_True
+%token Token_False
+
 %token Token_Skip
 %token Token_Assign
 %token Token_Seq
@@ -118,9 +121,10 @@ expr:
   | Token_Decr Token_Var             {Expr_PreMinus(Var $2)} 
   | Token_Var Token_EAssign expr     {Expr_EAssign(Var $1,$3)}
   | Token_LPar expr Token_RPar       {$2}
-  | Token_String                     {Expr_String(Scanf.unescaped(String.sub $1 1 ((String.length $1) - 2)))}
+  | Token_String                     {let s = (String.sub $1 1 ((String.length $1) - 2)) in Expr_String(Scanf.sscanf ("\"" ^ s ^ "\"") "%S" (fun u -> u))}
   | Token_Parse Token_LPar expr Token_RPar                {Expr_Parse($3)}
   | expr Token_Cons expr             {Expr_Cons($1, $3)}
   | Token_Escape Token_LPar expr Token_RPar               {Expr_Escape($3)}
-  | Token_Unescape Token_LPar expr Token_RPar               {Expr_Unescape($3)}
+  | Token_True                       {Expr_Bool true}
+  | Token_False                       {Expr_Bool false}
 %%
