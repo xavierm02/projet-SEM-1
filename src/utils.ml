@@ -112,12 +112,17 @@ let string_of_exception_label =
 
 let string_of_print_label = function
   | None -> ""
-  | Some s -> "> " ^ (value_to_string s)
+  | Some s -> value_to_string s
   
 
 let string_of_label ((exception_label, print_label) : label) =
   (string_of_exception_label exception_label) ^ " " ^ (string_of_print_label print_label)
 
+let string_of_label_indented initial_indent ((exception_label, print_label) : label) =
+  let exn_str = exception_label |> string_of_exception_label in
+  let space_str = String.make (exn_str |> String.length |> (+) initial_indent) ' ' in
+  let print_str = print_label |> string_of_print_label |> Str.split_delim (Str.regexp_string "\n") |> String.concat ("\n" ^ space_str ^ "> ") in
+  exn_str ^ " > " ^ print_str
 
 let (|>) x f = f x
 let (%>) f g x = x |> f |> g

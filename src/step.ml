@@ -171,7 +171,8 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
 let rec run (p, sigma) : ToyEnv.env =
   print_env sigma;
   let label, outcome = step (p, sigma) in
-  "↓ " ^ (label |> string_of_label) ^ "\n" |> print_string;
+  "↓ " ^ (label |> string_of_label_indented 2) ^ "\n"
+  |> print_string;
   let label_exception, label_print = label in
   match label_exception with
   | Tau -> begin
