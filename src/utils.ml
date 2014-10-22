@@ -1,29 +1,7 @@
 (** Fichiers de définitions auxiliaires *)
 open ToyTypes
 
-(** {2 Fonctions utiles pour la manipulations des valeurs TOY} *)
-let print_bool b = print_string (string_of_bool b)
-(** [print_value v] affiche la valeur [v] sur la sortie standard. *)
-let print_value v =
-  match v with
-  | Int(n) -> print_int n
-  | Bool(b) -> print_bool b
-  | String(s) -> print_string s
-  | Prog(p) -> print_string "<program>"
 
-let value_to_string = function
-  | Int n -> string_of_int n
-  | Bool b -> string_of_bool b
-  | String s -> s
-  | Prog p -> "<program>"
-
-(** [string_of_value v] construit la chaîne représentant la valeur [v] *)
-let string_of_value : value -> string =
-  function
-  | Int(i) -> string_of_int i
-  | Bool(b) -> string_of_bool b
-  | String s ->  "\"" ^ (String.escaped s) ^ "\""
-  | Prog p -> "<program>"
 
 let string_to_value s = String s
 
@@ -39,7 +17,7 @@ let value_to_int v =
 let value_to_bool v =
   match v with
   | Bool(b) -> b
-  | _ -> failwith"value_to_int: expected value parameter of type Int"
+  | _ -> failwith"value_to_bool: expected value parameter of type Bool"
 
 
 (** [value0] est la constante 0 de TOY *)
@@ -104,25 +82,6 @@ let parse source =
   (fun ch ->
     ToyParser.make_prog ToyLexer.make_token (Lexing.from_channel ch)
   )
-
-let string_of_exception_label =
-  function
-  | Tau -> "τ"
-  | Label l -> l
-
-let string_of_print_label = function
-  | None -> ""
-  | Some s -> value_to_string s
-  
-
-let string_of_label ((exception_label, print_label) : label) =
-  (string_of_exception_label exception_label) ^ " " ^ (string_of_print_label print_label)
-
-let string_of_label_indented initial_indent ((exception_label, print_label) : label) =
-  let exn_str = exception_label |> string_of_exception_label in
-  let space_str = String.make (exn_str |> String.length |> (+) initial_indent) ' ' in
-  let print_str = print_label |> string_of_print_label |> Str.split_delim (Str.regexp_string "\n") |> String.concat ("\n" ^ space_str ^ "> ") in
-  exn_str ^ " > " ^ print_str
 
 let (|>) x f = f x
 let (%>) f g x = x |> f |> g

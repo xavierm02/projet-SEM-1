@@ -2,6 +2,48 @@ open ToyTypes
 open Printf
 open Utils
 
+(** {2 Fonctions utiles pour la manipulations des valeurs TOY} *)
+let print_bool b = print_string (string_of_bool b)
+
+let default_string_of_prog p = "<program>"
+let string_of_prog_ref = ref default_string_of_prog
+
+let value_to_string = function
+  | Int n -> string_of_int n
+  | Bool b -> string_of_bool b
+  | String s -> s
+  | Prog p -> (!string_of_prog_ref) p
+
+(** [string_of_value v] construit la chaîne représentant la valeur [v] *)
+let string_of_value : value -> string =
+  function
+  | Int(i) -> string_of_int i
+  | Bool(b) -> string_of_bool b
+  | String s ->  "\"" ^ (String.escaped s) ^ "\""
+  | Prog p -> default_string_of_prog p
+
+(** [print_value v] affiche la valeur [v] sur la sortie standard. *)
+let print_value = string_of_value %> print_string
+
+let string_of_exception_label =
+  function
+  | Tau -> "τ"
+  | Label l -> l
+
+let string_of_print_label = function
+  | None -> ""
+  | Some s -> value_to_string s
+  
+
+let string_of_label ((exception_label, print_label) : label) =
+  (string_of_exception_label exception_label) ^ " " ^ (string_of_print_label print_label)
+
+let string_of_label_indented initial_indent ((exception_label, print_label) : label) =
+  let exn_str = exception_label |> string_of_exception_label in
+  let space_str = String.make (exn_str |> String.length |> (+) initial_indent) ' ' in
+  let print_str = print_label |> string_of_print_label |> Str.split_delim (Str.regexp_string "\n") |> String.concat ("\n" ^ space_str ^ "> ") in
+  exn_str ^ " > " ^ print_str
+
 let output_string s (oc: out_channel) : unit =
   fprintf oc "%s" s
 
@@ -184,3 +226,21 @@ let print_prog (p: prog) : unit =
   fprintf stdout "%t\n"
   (output_prog p)
 
+(* Ugly hack to avoid having to rewrite the whole printer *)
+let string_of_prog (p: prog) : string =
+  let (in_desc, out_desc) = Unix.pipe () in
+  let in_chan = Unix.in_channel_of_descr in_desc in
+  let out_chan = Unix.out_channel_of_descr out_desc in
+  fprintf out_chan "%t\n" (output_prog p);
+  close_out out_chan;
+  let l = ref [] in
+  try
+    while true do
+      l := input_line in_chan :: !l
+    done;
+    failwith "Impossible!"
+  with
+  | End_of_file -> !l |> List.rev |> String.concat "\n"
+
+let _ =
+  string_of_prog_ref := string_of_prog

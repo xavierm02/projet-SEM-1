@@ -1,5 +1,5 @@
 x := "z := \"test\"";
 y := parse x;
 eval y;
-print z
-
+print z;
+print y
