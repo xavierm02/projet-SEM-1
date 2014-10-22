@@ -157,8 +157,8 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_LessEqual(e,f) -> print_binop aux ctxt Prio_Comp " <= " e f
   | Expr_Greater(e,f) -> print_binop aux ctxt Prio_Comp " > " e f
   | Expr_GreaterEqual(e,f) -> print_binop aux ctxt Prio_Comp " >= " e f
-  | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_Unary "++ " s
-  | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_Unary "-- " s
+  | Expr_PostPlus(s) -> print_unopd aux ctxt Prio_MIN "++ " s
+  | Expr_PostMinus(s) -> print_unopd aux ctxt Prio_MIN "-- " s
   | Expr_PrePlus(s) -> print_unopg aux ctxt Prio_Unary " ++" s
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
   | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
