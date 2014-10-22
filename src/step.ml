@@ -51,7 +51,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
       let (x1, sigma') = eval_unop (fun x -> x) (Expr_Var v) sigma in
       match x1 with
       | Label2 l -> (Label2 l, sigma')
-      | Value2 v1 -> (Value2 v1, (update_env v v1 sigma'))
+      | Value2 v1 -> (Value2 v1, (update_env v (op v1) sigma'))
     end
     | Expr_PrePlus v -> eval_expr (Expr_EAssign (v, (Expr_Plus (Expr_Var v, Expr_Num 1)))) sigma
     | Expr_PreMinus v -> eval_expr (Expr_EAssign (v, (Expr_Minus (Expr_Var v, Expr_Num 1)))) sigma
