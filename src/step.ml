@@ -160,7 +160,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
       end
       | Label _ -> (label, Finished (outcome |> env_of_outcome))
     end
-    | _ -> failwith "Eval can only be applied to Prog values!"
+    | _ -> ((Label "eval_non_prog", Some (String "Eval can only be applied to Prog values!")), Finished sigma')
   end
   | Unsupported -> begin
     ToyPrinter.print_prog p;
@@ -179,11 +179,14 @@ let rec run (p, sigma) : ToyEnv.env =
     match outcome with
     | Continue (p', sigma') -> run (p', sigma')
     | Finished sigma' -> print_env sigma'; sigma'
+    ;
+    print_endline "Program stopped normally.";
+    outcome |> env_of_outcome
   end
   | Label l -> begin
     let sigma' = outcome |> env_of_outcome in
     print_env sigma';
-    "Exception: " ^ l ^ "\n" |> print_string;
+    print_endline ("Program stopped because of an uncaught exception: " ^ l);
     sigma'
   end
 
@@ -196,6 +199,5 @@ let go_step file =
   print_line ();
   ToyPrinter.print_prog prog;
   print_line ();
-  let _ = run (prog, ToyEnv.init_env) in
-  print_line ();
-  print_endline "Program stopped."
+  run (prog, ToyEnv.init_env) |> ignore
+
