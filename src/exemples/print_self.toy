@@ -1,1 +1,1 @@
-p := "print (\"p := \\\"\" ^ (escape p) ^ \"\\\"\"); print p"; print ("p := \"" ^ (escape p) ^ "\""); print p
+p := "print \"p := \\\"\" ^ (escape p) ^ \"\\\"\"; print p";print "p := \"" ^ (escape p ^ "\""); print p

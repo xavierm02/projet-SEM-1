@@ -119,6 +119,6 @@ expr:
   | Token_String                     {Expr_String(Scanf.unescaped(String.sub $1 1 ((String.length $1) - 2)))}
   | Token_Parse expr                 {Expr_Parse($2)}
   | expr Token_Cons expr             {Expr_Cons($1, $3)}
-  | Token_Escape expr                {Expr_Escape($2)}
-  | Token_Unescape expr                {Expr_Unescape($2)}
+  | Token_Escape Token_LPar expr Token_RPar               {Expr_Escape($3)}
+  | Token_Unescape Token_LPar expr Token_RPar               {Expr_Unescape($3)}
 %%

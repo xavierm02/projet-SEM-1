@@ -41,8 +41,9 @@ let string_of_label ((exception_label, print_label) : label) =
 let string_of_label_indented initial_indent ((exception_label, print_label) : label) =
   let exn_str = exception_label |> string_of_exception_label in
   let space_str = String.make (exn_str |> String.length |> (+) initial_indent) ' ' in
-  let print_str = print_label |> string_of_print_label |> Str.split_delim (Str.regexp_string "\n") |> String.concat ("\n" ^ space_str ^ "> ") in
-  exn_str ^ " > " ^ print_str
+  match print_label with
+  | Some s -> exn_str ^ " > " ^ (Some s |> string_of_print_label |> Str.split_delim (Str.regexp_string "\n") |> String.concat ("\n" ^ space_str ^ "> "))
+  | None -> exn_str
 
 let output_string s (oc: out_channel) : unit =
   fprintf oc "%s" s
@@ -69,7 +70,6 @@ type priority =
   | Prio_And
   | Prio_Not
   | Prio_Comp
-  | Prio_Cons
   | Prio_Plus
   | Prio_Mult
   | Prio_Unary
@@ -115,6 +115,15 @@ let output_expr : expr -> out_channel -> unit =
       (string_of_var r)
       (paren_close ctxt prio)      
   in
+  let print_fun f ctxt prio name r oc =
+      fprintf oc
+      "%t%s%t%s%t"
+      (paren_open ctxt prio)
+      (name ^ "(")
+      (f prio r)
+      ")"
+      (paren_close ctxt prio)      
+  in
   let print_binop2 f ctxt prio op l r oc =
       fprintf oc
       "%t%s%s%t%t"
@@ -146,11 +155,11 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_PreMinus(s) -> print_unopg aux ctxt Prio_Unary " --" s
   | Expr_EAssign(s,e) -> print_binop2 aux ctxt Prio_Assign " <- " s e
   | Expr_String(s) -> output_value (String s)
-  | Expr_Parse(s) -> print_unopg2 aux ctxt Prio_Unary " parse " s
+  | Expr_Parse(s) -> print_unopg2 aux ctxt Prio_Unary "parse " s
   | Expr_Prog(s) -> output_string "<program>"
-  | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Cons " ^ " e f
-  | Expr_Escape(s) -> print_unopg2 aux ctxt Prio_Unary " escape " s
-  | Expr_Unescape(s) -> print_unopg2 aux ctxt Prio_Unary " unescape " s
+  | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Plus " ^ " e f
+  | Expr_Escape(s) -> print_fun aux ctxt Prio_Unary "escape" s
+  | Expr_Unescape(s) -> print_fun aux ctxt Prio_Unary "unescape" s
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN
