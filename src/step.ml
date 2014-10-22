@@ -66,6 +66,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
       eval_unop (fun v1 -> String (String.escaped (value_to_string v1))) e1 sigma
     | Expr_Unescape e1 ->
       eval_unop (fun v1 -> String (Scanf.unescaped (value_to_string v1))) e1 sigma
+    | Expr_Bool b -> (Bool b, sigma)
     | Expr_Unsupported -> failwith "Unsupported expression!"
 
 (** Type des configurations d'exécution *)

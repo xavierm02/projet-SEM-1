@@ -18,6 +18,9 @@ let CONS = "^"
 let ESCAPE = "escape"
 let UNESCAPE = "unescape"
 
+let TRUE = "true"
+let FALSE = "false"
+
 let ANY = _
 
 let LPAR = "("
@@ -118,6 +121,9 @@ rule make_token = parse
   | CONS                {Token_Cons}
   | ESCAPE              {Token_Escape}
   | UNESCAPE              {Token_Unescape}
+  
+  | TRUE                {Token_True}
+  | FALSE               {Token_False}
   
   | NUMBER
     {

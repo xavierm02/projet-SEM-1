@@ -47,6 +47,7 @@ and expr =
   | Expr_Cons of (expr * expr)
   | Expr_Escape of expr
   | Expr_Unescape of expr
+  | Expr_Bool of bool
   | Expr_Unsupported
 
 (** Type des programmes TOY *)

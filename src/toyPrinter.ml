@@ -168,6 +168,7 @@ let output_expr : expr -> out_channel -> unit =
   | Expr_Cons(e,f) -> print_binop aux ctxt Prio_Plus " ^ " e f
   | Expr_Escape(s) -> print_fun aux ctxt Prio_Unary "escape" s
   | Expr_Unescape(s) -> print_fun aux ctxt Prio_Unary "unescape" s
+  | Expr_Bool(s) -> output_value (Bool s)
   | Expr_Unsupported -> failwith "output_expr: Unsupported expression"
   in
   aux Prio_MIN
