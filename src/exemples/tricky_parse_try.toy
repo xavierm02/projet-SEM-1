@@ -1,0 +1,25 @@
+exn := "";
+incr_exn := parse("exn := exn ^ \"e\"");
+compute_p := parse("
+  p := \"
+    try
+      try
+        raise \" ^ exn ^ \"
+      with eee ->
+        eval done
+      end
+    with \" ^ exn ^ \" ->
+      eval step
+    end
+  \"
+");
+step := parse("
+  eval incr_exn;
+  eval compute_p;
+  print p;
+  eval parse(p)
+");
+done := parse("
+  print \"done\"
+");
+eval step
