@@ -29,7 +29,6 @@
 
 %token Token_Cons
 %token Token_Escape
-%token Token_Unescape
 
 %token Token_Plus Token_Minus
 %token Token_Mult Token_Div
@@ -113,6 +112,8 @@ expr:
   | Token_Not expr                   {Expr_Not($2)}
   | Token_Plus  expr %prec UnarySign {$2}
   | Token_Minus expr %prec UnarySign {$2}
+  | Token_True                       {Expr_Bool(true)}
+  | Token_False                      {Expr_Bool(false)}
   | Token_Num                        {Expr_Num($1)}
   | Token_Var                        {Expr_Var(Var $1)}
   | Token_Var Token_Incr             {Expr_PostPlus(Var $1)} 
