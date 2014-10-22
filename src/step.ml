@@ -25,7 +25,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
     | Expr_Var v -> begin
 	  match eval_env v sigma with
 	    | Some x -> (Value2 x, sigma)
-	    | None -> failwith ("Uninitialized_Variable " ^ (v |> string_of_var) ^ "!")
+	    | None -> (Label2 (Label "uninitialized_variable", Some (String ("Uninitialized_Variable " ^ (v |> string_of_var) ^ "!"))), sigma)
 	 end
     | Expr_Plus (e1, e2) -> eval_binop (lift_binop_int_int (+)) e1 e2 sigma
     | Expr_Minus (e1, e2) -> eval_binop (lift_binop_int_int (-)) e1 e2 sigma
@@ -68,7 +68,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
       | Value2 (String s) ->
         let p = ToyParser.make_prog ToyLexer.make_token (Lexing.from_string s) in (* TODO CATCH EXCEPTION *)
         (Value2 (Prog p), sigma)
-      | _ -> failwith "Parse can only be applied to String values."
+      | _ -> (Label2 (Label "parse_non_string", Some (String ("Parse can only be applied to String values!"))), sigma)
     end
     | Expr_Prog p -> (Value2 (Prog p), sigma)
     | Expr_Cons (e1, e2) ->

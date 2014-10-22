@@ -1,2 +1,2 @@
 x := 1024;
-print x
+y := parse(x)
