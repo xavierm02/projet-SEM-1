@@ -30,7 +30,12 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
     | Expr_Plus (e1, e2) -> eval_binop (lift_binop_int_int (+)) e1 e2 sigma
     | Expr_Minus (e1, e2) -> eval_binop (lift_binop_int_int (-)) e1 e2 sigma
     | Expr_Mult (e1, e2) -> eval_binop (lift_binop_int_int ( * )) e1 e2 sigma
-    | Expr_Div (e1, e2) -> eval_binop (lift_binop_int_int (/)) e1 e2 sigma
+    | Expr_Div (e1, e2) -> begin
+      try
+        eval_binop (lift_binop_int_int (/)) e1 e2 sigma
+      with
+      | Division_by_zero -> (Label2 (Label "divide_by_zero", Some (String ("Divided by zero!"))), sigma)
+    end
     | Expr_Not e1 -> eval_unop (lift_unop_bool (not)) e1 sigma
     | Expr_And (e1, e2) -> eval_binop (lift_binop_bool_bool (&&)) e1 e2 sigma
     | Expr_Or (e1, e2) -> eval_binop (lift_binop_bool_bool (||)) e1 e2 sigma
@@ -65,9 +70,13 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value_or_label * env =
       let (v1, sigma') = eval_expr e sigma in
       match v1 with
       | Label2 _ -> (v1, sigma')
-      | Value2 (String s) ->
-        let p = ToyParser.make_prog ToyLexer.make_token (Lexing.from_string s) in (* TODO CATCH EXCEPTION *)
-        (Value2 (Prog p), sigma)
+      | Value2 (String s) -> begin
+        try
+	  let p = ToyParser.make_prog ToyLexer.make_token (Lexing.from_string s) in
+	  (Value2 (Prog p), sigma)
+	with
+	| Parsing.Parse_error -> (Label2 (Label "parse_error", Some (String ("Could not parse expression!"))), sigma)
+      end
       | _ -> (Label2 (Label "parse_non_string", Some (String ("Parse can only be applied to String values!"))), sigma)
     end
     | Expr_Prog p -> (Value2 (Prog p), sigma)
