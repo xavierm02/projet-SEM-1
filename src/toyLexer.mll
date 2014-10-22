@@ -10,7 +10,7 @@ let COMMENT = '#' LINE
 
 let NUM = ['0'-'9']
 let ALPHA =  ['a'-'z' 'A'-'Z' '_' ]
-let WORD = ALPHA (ALPHA | '-' | NUM)*
+let WORD = ALPHA (ALPHA | NUM)*
 let NUMBER = '-'? ['0'-'9']+
 let STRING = '"' (('\092' ('\092' | [^ '\092'])) | ([^ '"' '\092']))* '"'
 
