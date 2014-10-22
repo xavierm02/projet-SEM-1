@@ -1,3 +1,5 @@
+open Utils
+
 let () =
   let files =
     match Sys.argv |> Array.to_list with
