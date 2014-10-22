@@ -10,13 +10,15 @@ let COMMENT = '#' LINE
 
 let NUM = ['0'-'9']
 let ALPHA =  ['a'-'z' 'A'-'Z' '_' ]
-let WORD = ALPHA (ALPHA | '-' | NUM)*
+let WORD = ALPHA (ALPHA | NUM)*
 let NUMBER = '-'? ['0'-'9']+
 let STRING = '"' (('\092' ('\092' | [^ '\092'])) | ([^ '"' '\092']))* '"'
 
 let CONS = "^"
 let ESCAPE = "escape"
-let UNESCAPE = "unescape"
+
+let TRUE = "true"
+let FALSE = "false"
 
 let ANY = _
 
@@ -117,7 +119,9 @@ rule make_token = parse
   
   | CONS                {Token_Cons}
   | ESCAPE              {Token_Escape}
-  | UNESCAPE              {Token_Unescape}
+  
+  | TRUE                {Token_True}
+  | FALSE               {Token_False}
   
   | NUMBER
     {

@@ -46,7 +46,7 @@ and expr =
   | Expr_Prog of prog
   | Expr_Cons of (expr * expr)
   | Expr_Escape of expr
-  | Expr_Unescape of expr
+  | Expr_Bool of bool
   | Expr_Unsupported
 
 (** Type des programmes TOY *)
@@ -69,3 +69,6 @@ exception Unsupported_Expression
 exception Uninitialized_Variable of var
 exception Unsupported_Command
 
+type value_or_label =
+  | Value2 of value
+  | Label2 of label
