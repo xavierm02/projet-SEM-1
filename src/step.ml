@@ -50,7 +50,7 @@ let rec eval_expr expr (sigma: ToyEnv.env) : value * env =
     | Expr_EAssign (v, e) ->
       let (v1, sigma') = eval_expr e sigma in
       (v1, (update_env v v1 sigma'))
-    | Expr_String s -> (*"@@@" ^ s ^ "\n###" |> print_string;*)(Utils.string_to_value (s), sigma)
+    | Expr_String s -> (Utils.string_to_value (s), sigma)
     | Expr_Parse e -> begin
       let (v1, sigma') = eval_expr e sigma in
       match v1 with
