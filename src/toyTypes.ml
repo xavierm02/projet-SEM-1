@@ -70,3 +70,6 @@ exception Unsupported_Expression
 exception Uninitialized_Variable of var
 exception Unsupported_Command
 
+type value_or_label =
+  | Value2 of value
+  | Label2 of label
