@@ -163,8 +163,7 @@ let rec step (p, (sigma: ToyEnv.env)) : label * outcome =
     | _ -> ((Label "eval_non_prog", Some (String "Eval can only be applied to Prog values!")), Finished sigma')
   end
   | Unsupported -> begin
-    ToyPrinter.print_prog p;
-    raise Unsupported_Command |> add_default_label
+    ((Label "unsupported_command", Some (String "This command is not supported yet!")), Finished sigma)
   end
 
 (** Fermeture reflexive-transitive de [step] *)
